@@ -1,4 +1,4 @@
-
+ 
 /*****************************************************************************************
  * @file  TestTupleGenerator.java
  *
@@ -7,6 +7,7 @@
 
 import java.util.Random;
 
+import static java.lang.System.nanoTime;
 import static java.lang.System.out;
 
 /*****************************************************************************************
@@ -21,8 +22,9 @@ public class TestTupleGenerator
      *
      * @param studentTable the Student table to be used for this method
      * @param size the size of the table therefore the ref -1
+     * @return a long representing the time it took to run select, in nanotime
      */
-    public static void testOne(Table studentTable, int size)
+    public static long testOne(Table studentTable, int size)
     {
         var rand       = new Random();
         var tupC = new Comparable[4];
@@ -33,7 +35,9 @@ public class TestTupleGenerator
         int ref = (int)tupC[0] % size + 1;
         out.println("<<<<< TEST ONE >>>>>");
         KeyType searching = new KeyType(tupC[0]);
+        var t0 = nanoTime ();
         studentTable.select(searching).print();
+        return (nanoTime () - t0) / 1000;
     } //testOne
 
     /********************************************************************************
@@ -42,8 +46,9 @@ public class TestTupleGenerator
      * @param studentTable the Student table to be used for this method
      * @param dIndex the dIndex that is being used
      * @param size the size of the table therefore the ref -1
+     * @return a long representing the time it took to run the select
      */
-    public static void testTwo(Table studentTable, DIndex dIndex, int size)
+    public static long testTwo(Table studentTable, DIndex dIndex, int size)
     {
         var rand       = new Random ();
         var tupC = new Comparable[4];
@@ -55,22 +60,60 @@ public class TestTupleGenerator
         dIndex.put (ref, studentTable.insert (tupC));
         KeyType searching = new KeyType(tupC[0]);
         out.println("<<<<< TEST TWO >>>>>");
+        var t0 = nanoTime ();
         studentTable.select(searching).print();
+        return (nanoTime () - t0) / 1000;
     } //testTwo
 
     /********************************************************************************
      * Run the third test for this table related to join. This involves having found all tuples to join.
      *
-     * @param studentTable the Student table to be used for this method
-     * @param transcriptTable the Transcript table to be used for this method
-     * @param stuDIndex the dIndex for student table
-     * @param tranDIndex the dIndex for transcript table
+     * @param testerTable the first tester table to be used for this method
+     * @param oTesterTable the other tester table to be used for this method
+     * @return a long representing the time it took to run index Join
      */
-    public static void testThree(Table studentTable, Table transcriptTable, DIndex stuDIndex, DIndex tranDIndex)
+    public static long testThree(Table testerTable, Table oTesterTable)
     {
         out.println("<<<<< TEST THREE >>>>>");
-        transcriptTable.i_join("studId", "id", studentTable).print();
+        var t0 = nanoTime ();
+        oTesterTable.i_join("studId", "id", testerTable).print();
+        return (nanoTime () - t0) / 1000;
     } //testThree
+
+    /********************************************************************************
+     * Run the fourth test for this table related to join. This involves having found all tuples to join.
+     *
+     * @param oTesterTable the other tester table to be used for this method
+     * @param size the size of the table to be joined (original table)
+     * @return a long representing the time it took to run index Join
+     */
+    public static long testFour(Table oTesterTable, int size)
+    {
+        out.println("<<<<< TEST FOUR >>>>>");
+        var test = new TupleGeneratorImpl ();
+        test.addRelSchema ("Student",
+                "id name address status",
+                "Integer String String String",
+                "id",
+                null);
+        var studentTable = new Table ("Student",
+                "id name address status",
+                "Integer String String String",
+                "id");
+        var  studentDIndex = new DIndex(size + 1);
+        var tups   = new int [] {size};
+        var resultTest = test.generate (tups);
+        for (var i = 0; i < resultTest.length; i++) {
+            for (var j = 0; j < resultTest [i].length; j++) {
+                int ref = (int)resultTest[i][j][0] % (resultTest[i].length + 1);
+               studentDIndex.put (ref, studentTable.insert(resultTest[i][j]));
+            } // for
+            studentTable.print();
+        } // for
+        var t0 = nanoTime ();
+        oTesterTable.i_join("studId", "id", studentTable).print();
+        return (nanoTime () - t0) / 1000;
+    } //testFour
 
     /*************************************************************************************
      * The main method is the driver for TestGenerator.
@@ -161,10 +204,22 @@ public class TestTupleGenerator
             tableObjs[i].print();
         } // for
         ///to commit
-        out.println("Size of dIndex " + dIndexObjs[1].size());
-        testOne(tableObjs[0], tups[0]);
-        testTwo(tableObjs[0], dIndexObjs[0], tups[0]);
-        testThree(tableObjs[0], tableObjs[4], dIndexObjs[0], dIndexObjs[4]);
+        long [] testAverage = new long[4];
+        for (int i = 0; i < 6; i++) {
+            if (i >0) {
+                out.println("Test trail " + i);
+                testAverage[0] += testOne(tableObjs[0], tups[0]);
+                testAverage[1] += testTwo(tableObjs[1], dIndexObjs[0], tups[0]);
+                testAverage[2] += testThree(tableObjs[0], tableObjs[4]);
+                testAverage[3] += testFour(tableObjs[4], tups[0]);
+            } //if
+            if (i == 5) {
+                out.println("For test one average: " + (testAverage[0]/5));
+                out.println("For test two average: " + (testAverage[1]/5));
+                out.println("For test three average: " + (testAverage[2]/5));
+                out.println("For test four average: " + (testAverage[3]/5));
+            } //if
+        } //for
     } // main
 
 } // TestTupleGenerator
