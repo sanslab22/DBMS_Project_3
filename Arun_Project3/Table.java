@@ -1,23 +1,20 @@
 
-/* ***************************************************************************************
+/****************************************************************************************
  * @file  Table.java
  *
  * @author   John Miller
  *
  * compile javac --enable-preview --release 21 *.java
- * run     java --enable-preview MovieDB    
+ * run     java --enable-preview MovieDB
  */
 
 import java.io.*;
-import java.security.spec.RSAOtherPrimeInfo;
 import java.util.*;
 import java.util.function.*;
 import java.util.stream.*;
 
-import static java.lang.Boolean.*;
 import static java.lang.System.arraycopy;
 import static java.lang.System.out;
-
 
 /****************************************************************************************
  * The Table class implements relational database tables (including attribute names, domains
@@ -26,7 +23,7 @@ import static java.lang.System.out;
  * Missing are update and delete data manipulation operators.
  */
 public class Table
-       implements Serializable
+        implements Serializable
 {
     /** Relative path for storage directory
      */
@@ -59,7 +56,7 @@ public class Table
      */
     private final List <Comparable []> tuples;
 
-    /** Primary key (the attributes forming). 
+    /** Primary key (the attributes forming).
      */
     private final String [] key;
 
@@ -73,11 +70,7 @@ public class Table
 
     /** The map type to be used for indices.  Change as needed.
      */
-
     private static final MapType mType = MapType.BPTREE_MAP;
-
-    //private static final MapType mType = MapType.HASH_MAP;
-
 
     /************************************************************************************
      * Make a map (index) given the MapType.
@@ -85,23 +78,23 @@ public class Table
     private static Map <KeyType, Comparable []> makeMap ()
     {
         return switch (mType) {
-        case NO_MAP      -> null;
-        case TREE_MAP    -> new TreeMap <> ();
-        case HASH_MAP    -> new HashMap <> ();
-        //case LINHASH_MAP -> new LinHashMap <> (KeyType.class, Comparable [].class);
-        case BPTREE_MAP  -> new BpTreeMap <> (KeyType.class, Comparable [].class);
-        default          -> null;
+            case NO_MAP      -> null;
+            case TREE_MAP    -> new TreeMap <> ();
+            case HASH_MAP    -> new HashMap <> ();
+            //  case LINHASH_MAP -> new LinHashMap <> (KeyType.class, Comparable [].class);
+            case BPTREE_MAP  -> new BpTreeMap <> (KeyType.class, Comparable [].class);
+            default          -> null;
         }; // switch
     } // makeMap
 
     /************************************************************************************
      * Concatenate two arrays of type T to form a new wider array.
      *
-     * @see <a href="http://stackoverflow.com/questions/80476/how-to-concatenate-two-arrays-in-java">...</a>
+     * @see http://stackoverflow.com/questions/80476/how-to-concatenate-two-arrays-in-java
      *
      * @param arr1  the first array
      * @param arr2  the second array
-     * @return a wider array containing all the values from arr1 and arr2
+     * @return  a wider array containing all the values from arr1 and arr2
      */
     public static <T> T [] concat (T [] arr1, T [] arr2)
     {
@@ -121,7 +114,7 @@ public class Table
      * @param _attribute  the string containing attributes names
      * @param _domain     the string containing attribute domains (data types)
      * @param _key        the primary key
-     */  
+     */
     public Table (String _name, String [] _attribute, Class [] _domain, String [] _key)
     {
         name      = _name;
@@ -141,7 +134,7 @@ public class Table
      * @param _domain     the string containing attribute domains (data types)
      * @param _key        the primary key
      * @param _tuples     the list of tuples containing the data
-     */  
+     */
     public Table (String _name, String [] _attribute, Class [] _domain, String [] _key,
                   List <Comparable []> _tuples)
     {
@@ -178,55 +171,27 @@ public class Table
      *
      * #usage movie.project ("title year studioNo")
      *
-     * @author Tristan Dominy - Project 2
-     * @author Madhu Sudhan Reddy Chencharapu - Project 1
-     *
      * @param attributes  the attributes to project onto
      * @return  a table of projected tuples
      */
     public Table project (String attributes)
     {
         out.println ("RA> " + name + ".project (" + attributes + ")");
-        var attrs = attributes.split (" ");
+        var attrs     = attributes.split (" ");
         var colDomain = extractDom (match (attrs), domain);
-        int[] colPos = match(attrs);
-        List <Comparable []> rows = new ArrayList <> ();
         var newKey    = (Arrays.asList (attrs).containsAll (Arrays.asList (key))) ? key : attrs;
 
-        // check if the given column are valid
-        for(int col : colPos){
-            if (col == -1){
-                out.println(" you are given an invalid attributes please check the attributes");
-                return new Table (name + count++, attrs, colDomain, newKey, rows);
-            }
-        }
+        List <Comparable []> rows = new ArrayList <> ();
 
-        // table to store the resulting project table with its attributes, domain and key
-        Table newTable = new Table (name + count++, attrs, colDomain, newKey);
-        for(int i = 0 ; i < tuples.size() ; i++){
-            // create new tuple with projected column
-            var newtuple = new Comparable[colPos.length];
-            for(int j = 0 ; j < colPos.length ;j++) {
-                int colContent = colPos[j];
-                // copy the value of from original tuple to newtuple
-                newtuple[j] = tuples.get(i)[colContent];
-            }
-            KeyType compareR = new KeyType(newtuple);
-            // insert newtuple into the newTable if its not in the index
-            // eliminates duplicates
-            if (newTable.index.get(compareR) == null) {
-                newTable.insert(newtuple);
-            }
-        }
-        return newTable;
-        // return new Table (name + count++, attrs, colDomain, newKey,rows);
+        //  T O   B E   I M P L E M E N T E D
+
+        return new Table (name + count++, attrs, colDomain, newKey, rows);
     } // project
 
     /************************************************************************************
      * Select the tuples satisfying the given predicate (Boolean function).
      *
      * #usage movie.select (t -> t[movie.col("year")].equals (1977))
-     * 
      *
      * @param predicate  the check condition for tuples
      * @return  a table with tuples satisfying the predicate
@@ -236,8 +201,8 @@ public class Table
         out.println (STR."RA> \{name}.select (\{predicate})");
 
         return new Table (name + count++, attribute, domain, key,
-                   tuples.stream ().filter (t -> predicate.test (t))
-                                   .collect (Collectors.toList ()));
+                tuples.stream ().filter (t -> predicate.test (t))
+                        .collect (Collectors.toList ()));
     } // select
 
     /************************************************************************************
@@ -266,7 +231,7 @@ public class Table
     } // select
 
     /************************************************************************************
-     * Does tuple t satisfy the condition t[colNo] op value where op is ==, !=, <, <=, >, >=?
+     * Does tuple t satify the condition t[colNo] op value where op is ==, !=, <, <=, >, >=?
      *
      * #usage satisfies (t, 1, "<", "1980")
      *
@@ -280,34 +245,32 @@ public class Table
         var t_A = t[colNo];
         out.println (STR."satisfies: \{t_A} \{op} \{value}");
         var valt = switch (domain [colNo].getSimpleName ()) {      // type converted
-        case "Byte"      -> Byte.valueOf (value);
-        case "Character" -> value.charAt (0);
-        case "Double"    -> Double.valueOf (value);
-        case "Float"     -> Float.valueOf (value);
-        case "Integer"   -> Integer.valueOf (value);
-        case "Long"      -> Long.valueOf (value);
-        case "Short"     -> Short.valueOf (value);
-        case "String"    -> value;
-        default          -> value;
+            case "Byte"      -> Byte.valueOf (value);
+            case "Character" -> value.charAt (0);
+            case "Double"    -> Double.valueOf (value);
+            case "Float"     -> Float.valueOf (value);
+            case "Integer"   -> Integer.valueOf (value);
+            case "Long"      -> Long.valueOf (value);
+            case "Short"     -> Short.valueOf (value);
+            case "String"    -> value;
+            default          -> value;
         }; // switch
         var comp = t_A.compareTo (valt);
 
         return switch (op) {
-        case "==" -> comp == 0;
-        case "!=" -> comp != 0;
-        case "<"  -> comp <  0;
-        case "<=" -> comp <= 0;
-        case ">"  -> comp >  0;
-        case ">=" -> comp >= 0;
-        default   -> false;
+            case "==" -> comp == 0;
+            case "!=" -> comp != 0;
+            case "<"  -> comp <  0;
+            case "<=" -> comp <= 0;
+            case ">"  -> comp >  0;
+            case ">=" -> comp >= 0;
+            default   -> false;
         }; // switch
     } // satifies
 
     /************************************************************************************
      * Select the tuples satisfying the given key predicate (key = value).  Use an index
      * (Map) to retrieve the tuple with the given key value.  INDEXED SELECT algorithm.
-     *
-     * @author Mukta Deshmukh - Project 2
      *
      * @param keyVal  the given key value
      * @return  a table with the tuple satisfying the key predicate
@@ -318,6 +281,7 @@ public class Table
 
         List <Comparable []> rows = new ArrayList <> ();
 
+        //  T O   B E   I M P L E M E N T E D  - Project 2
         //Find the tuples associated with the keyVal
         Comparable[] tups = index.get(keyVal);
 
@@ -333,13 +297,9 @@ public class Table
      *
      * #usage movie.union (show)
      *
-     * @author Fidel Arroyo - Project 2
-     * @author Mukta Deshmukh - Project 1
-     * 
      * @param table2  the rhs table in the union operation
      * @return  a table representing the union
      */
-    //Implemented
     public Table union (Table table2)
     {
         //Print out a message to let the users know that the 'Union Operation' is being performed
@@ -378,9 +338,6 @@ public class Table
      *
      * #usage movie.minus (show)
      *
-     * @author Sanjana Arun - Project 2
-     * @author Fidel Arroyo - Project 1
-     *
      * @param table2  The rhs table in the minus operation
      * @return  a table representing the difference
      */
@@ -392,22 +349,16 @@ public class Table
         List <Comparable []> rows = new ArrayList <> ();
 
         Map<KeyType, Comparable[]> index = new HashMap<>();
-
-        // loop through table2 and set the index
         for(Comparable[] row2 : table2.tuples){
             var keyVal = new Comparable[key.length];
             var cols = match(key);
             for(var j = 0; j < keyVal.length; j++){
-                // keyVal stores the values from the current row from relevant columns
                 keyVal [j] = row2[cols [j]];
             }
             KeyType keyType = new KeyType(keyVal);
-            // key and row is inserted into a HashMap index
             index.put(keyType, row2);
         }
 
-        // loop through each row, check if the rows are in 'this' but not in table2
-        // handling duplicates
         for(Comparable[] row : this.tuples){
             var keyVal = new Comparable[key.length];
             var cols = match(key);
@@ -429,8 +380,6 @@ public class Table
      * a NESTED LOOP JOIN ALGORITHM.
      *
      * #usage movie.join ("studioName", "name", studio)
-     * 
-     * @author Tristan Dominy - Project 1
      *
      * @param attributes1  the attributes of this table to be compared (Foreign Key)
      * @param attributes2  the attributes of table2 to be compared (Primary Key)
@@ -440,19 +389,19 @@ public class Table
     public Table join (String attributes1, String attributes2, Table table2)
     {
         out.println (STR."RA> \{name}.join (\{attributes1}, \{attributes2}, \{table2.name})");
-        
+
         var t_attrs = attributes1.split (" ");
         var u_attrs = attributes2.split (" ");
         var rows    = new ArrayList <Comparable []> ();
         for (var t: tuples) {
             for(var j: table2.tuples) {
 
-                 if (t[col(attributes1)].equals(j[table2.col(attributes2)])) {
+                if (t[col(attributes1)].equals(j[table2.col(attributes2)])) {
                     rows.add(concat(t,j));
                 }
             }
         }
-       
+
         // Handling disambiguation
         String[] combined_arr_Attributes = concat(attribute, table2.attribute); // Create a combined array of attributes
 
@@ -464,13 +413,13 @@ public class Table
                 {
                     combined_arr_Attributes[attribute.length + j] = table2.attribute[j] + "2";
                     table2.attribute[j] += "2";
-                
+
+                }
             }
-             }
         }
 
         return new Table (name + count++, concat (attribute, table2.attribute),
-                                          concat (domain, table2.domain), key, rows);
+                concat (domain, table2.domain), key, rows);
     } // join
 
     /************************************************************************************
@@ -479,8 +428,6 @@ public class Table
      * to the end of any duplicate attribute name.  Implement using a Nested Loop Join algorithm.
      *
      * #usage movie.join ("studioName == name", studio)
-     * 
-     * @author Mukta Deshmukh - Project 1
      *
      * @param condition  the theta join condition
      * @param table2     the rhs table in the join operation
@@ -555,7 +502,7 @@ public class Table
         // I M P L E M E N T E D
 
         return new Table (name + count++, concat (attribute, table2.attribute),
-                                          concat (domain, table2.domain), key, rows);
+                concat (domain, table2.domain), key, rows);
     } // join
 
     /************************************************************************************
@@ -575,7 +522,6 @@ public class Table
         var u_attrs = attributes2.split(" ");
         var rows = new ArrayList<Comparable[]>();
 
-        // T O B E I M P L E M E N T E D
         // To check whether primary key and foreign key relationship is satisfied or not
         int count1 = 0;
         for (int i = 0; i < t_attrs.length; i++) {
@@ -589,7 +535,6 @@ public class Table
                 count2++;
             }
         }
-
         // Perform join on valid key types
         if (count1 == t_attrs.length && count2 == u_attrs.length) {
             for (int i = 0; i < tuples.size(); i++) {
@@ -618,7 +563,6 @@ public class Table
         } else {
             System.out.println("ERROR:  you are given an invalid attributes please check the attributes");
         }
-
         // adding ambiguous column name with 2
         for (int i = 0; i < attribute.length; i++) {
             for (int j = 0; j < table2.attribute.length; j++) {
@@ -638,8 +582,6 @@ public class Table
      * eliminated.
      *
      * #usage movieStar.join (starsIn)
-     * 
-     * @author Fidel Arroyo - Project 1
      *
      * @param table2  the rhs table in the join operation
      * @return  a table with tuples satisfying the equality predicate
@@ -647,30 +589,14 @@ public class Table
     public Table join (Table table2)
     {
         out.println (STR."RA> \{name}.join (\{table2.name})");
+
         var rows = new ArrayList <Comparable []> ();
-                
-        int [] columnNumbers = new int[this.attribute.length];
-        
-        //gets matching column number from table2 if there is a match
-        for (int index = 0; index < this.attribute.length; index++) {
-            columnNumbers[index] = table2.col(this.attribute[index]);
-        } //for
-        
-        rows = naturalRows(columnNumbers, table2);
+
+        //  T O   B E   I M P L E M E N T E D
+
         // FIX - eliminate duplicate columns
-        
-        String[] attributes = removeDupAtr(columnNumbers, table2);
-        Class[] domains = this.removeDupDom(columnNumbers, table2);
-        
-        if (attributes != null) {
-            attributes = concat(this.attribute, attributes);
-            domains = concat(this.domain, domains);
-        } else {
-            attributes = this.attribute;
-            domains = this.domain;
-        } //if-else
-        
-        return new Table (name + count++, attributes, domains, key, rows);
+        return new Table (name + count++, concat (attribute, table2.attribute),
+                concat (domain, table2.domain), key, rows);
     } // join
 
     /************************************************************************************
@@ -682,7 +608,7 @@ public class Table
     public int col (String attr)
     {
         for (var i = 0; i < attribute.length; i++) {
-           if (attr.equals (attribute [i])) return i;
+            if (attr.equals (attribute [i])) return i;
         } // for
 
         return -1;       // -1 => not found
@@ -694,9 +620,9 @@ public class Table
      * #usage movie.insert ("Star_Wars", 1977, 124, "T", "Fox", 12345)
      *
      * @param tup  the array of attribute values forming the tuple
-     * @return  whether insertion was successful
+     * @return  the insertion position/index when successful, else -1
      */
-    public boolean insert (Comparable [] tup)
+    public int insert (Comparable [] tup)
     {
         out.println (STR."DML> insert into \{name} values (\{Arrays.toString (tup)})");
 
@@ -706,11 +632,22 @@ public class Table
             var cols   = match (key);
             for (var j = 0; j < keyVal.length; j++) keyVal [j] = tup [cols [j]];
             if (mType != MapType.NO_MAP) index.put (new KeyType (keyVal), tup);
-            return true;
+            return tuples.size () - 1;                             // assumes it is added at the end
         } else {
-            return false;
+            return -1;                                             // insert failed
         } // if
     } // insert
+
+    /************************************************************************************
+     * Get the tuple at index position i.
+     *
+     * @param i  the index of the tuple being sought
+     * @return  the tuple at index position i
+     */
+    public Comparable [] get (int i)
+    {
+        return tuples.get (i);
+    } // get
 
     /************************************************************************************
      * Get the name of the table.
@@ -721,6 +658,17 @@ public class Table
     {
         return name;
     } // getName
+
+    /************************************************************************************
+     * Print tuple tup.
+     * @param tup  the array of attribute values forming the tuple
+     */
+    public void printTup (Comparable [] tup)
+    {
+        out.print ("| ");
+        for (var attr : tup) out.printf ("%15s", attr);
+        out.println (" |");
+    } // printTup
 
     /************************************************************************************
      * Print this table.
@@ -737,11 +685,7 @@ public class Table
         out.print ("|-");
         out.print ("---------------".repeat (attribute.length));
         out.println ("-|");
-        for (var tup : tuples) {
-            out.print ("| ");
-            for (var attr : tup) out.printf ("%15s", attr);
-            out.println (" |");
-        } // for
+        for (var tup : tuples) printTup (tup);
         out.print ("|-");
         out.print ("---------------".repeat (attribute.length));
         out.println ("-|");
@@ -763,7 +707,7 @@ public class Table
     } // printIndex
 
     /************************************************************************************
-     * Load the table with the given name into memory. 
+     * Load the table with the given name into memory.
      *
      * @param name  the name of the table to load
      */
@@ -841,13 +785,9 @@ public class Table
                 if (column [j].equals (attribute [k])) {
                     matched = true;
                     colPos [j] = k;
-                    break;
                 } // for
             } // for
-            if ( ! matched){
-                colPos[j] = -1;
-                out.println (STR."match: domain not found for \{column [j]}");
-            }
+            if ( ! matched) out.println (STR."match: domain not found for \{column [j]}");
         } // for
 
         return colPos;
@@ -858,7 +798,7 @@ public class Table
      *
      * @param t       the tuple to extract from
      * @param column  the array of column names
-     * @return  a smaller tuple extracted from tuple t 
+     * @return  a smaller tuple extracted from tuple t
      */
     private Comparable [] extract (Comparable [] t, String [] column)
     {
@@ -870,27 +810,17 @@ public class Table
 
     /************************************************************************************
      * Check the size of the tuple (number of elements in array) as well as the type of
-     * each value to ensure it is from the right domain. 
+     * each value to ensure it is from the right domain.
      *
-     * @author Madhu Sudhan Reddy Chencharapu - Project 1
-     * 
      * @param t  the tuple as a array of attribute values
      * @return  whether the tuple has the right size and values that comply
      *          with the given domains
      */
     private boolean typeCheck (Comparable [] t)
     {
-        for(int i = 0 ; i < this.domain.length; i++){
-            if(t[i] != null) {
-                String tuple_domain = t[i].getClass().getName();
-                String attribute_domain = this.domain[i].getName();
+        //  T O   B E   I M P L E M E N T E D
 
-                if (!tuple_domain.equals(attribute_domain)) {
-                    return false;
-                }
-            }
-        }
-        return true;
+        return true;      // change once implemented
     } // typeCheck
 
     /************************************************************************************
@@ -926,195 +856,11 @@ public class Table
         var obj = new Class [colPos.length];
 
         for (var j = 0; j < colPos.length; j++) {
-            if(colPos[j] == -1){
-                obj[j] = null;
-            }else {
-                obj[j] = group[colPos[j]];
-            }
+            obj [j] = group [colPos [j]];
         } // for
 
         return obj;
     } // extractDom
 
-    /************************************************************************************
-     * Returns the tuples or rows to be shown for a natural join
-     *
-     * @param columnNumbers the numbers with associated matching column names
-     * @param table2 the original table that was used for natural join
-     * @return  an updated array list representing the table rows
-     */
-    public ArrayList <Comparable []>  naturalRows (int [] columnNumbers, Table table2)
-    {
-        boolean [] tupleCheck = new boolean [this.tuples.size()];
-        var rows = new ArrayList <Comparable []> ();
-        //loops through each column (each attribute)
-        for (int index = 0; index < this.attribute.length; index++) {
-            if (columnNumbers[index] > -1) {
-                //loops through every tuple in this table
-                for (int jIndex = 0; jIndex < this.tuples.size(); jIndex++) {
-                    boolean notFound = true;
-                    int indexTwo = 0;
-                    //loops through every tuple in table2
-                    while ( (indexTwo < table2.tuples.size()) && notFound ) {
-                        if ( this.domain[index].getName().equals( table2.domain[columnNumbers[index]].getName() ) ) {
-                            //checks for matching values in the tuple
-                            if ( (this.tuples.get(jIndex)[index].compareTo(table2.tuples.get(indexTwo)[columnNumbers[index]]) == 0)) {
-                                notFound = false;
-                                //checks if current tuple has already been involved in join
-                                if (!tupleCheck[jIndex]) {
-                                    Comparable[] temp = removeDupTup(columnNumbers, table2, indexTwo);
-                                    if (temp != null) {
-                                        rows.add( concat(this.tuples.get(jIndex), temp) );
-                                    } else {
-                                        rows.add (this.tuples.get(jIndex));
-                                    } //if-else
-                                } //if
-                                tupleCheck[jIndex] = true;
-                            } //if
-                        } //if
-                        indexTwo++;
-                    } //while
-                } //for
-            } //if
-        } //for
-        return rows;
-    } //naturalRows
-
-    /************************************************************************************
-     * Ensures the rows or tuples do not have the duplicates due to the natural join concatenation.
-     *
-     * @param columnNumbers the numbers with associated matching column names
-     * @param table2 the foreign table that was used for natural join
-     * @param row the current tuple or row to add from foreign table
-     * @return  an updated array containing row info not currently found in this table
-     */
-    public Comparable []  removeDupTup (int [] columnNumbers, Table table2, int row)
-    {
-        int attributeSize = columnNumbers.length;
-        int attributeSize2 = table2.attribute.length;
-        Comparable[] temp = null;
-        //loops through table2.attribute length
-        for (int index = 0; index < attributeSize2; index++) {
-            boolean adder = true;
-            //loops through this table attribute length
-            for (int jIndex = 0; (jIndex < attributeSize) && adder; jIndex++) {
-                if (columnNumbers[jIndex] == index) {
-                    adder = false;
-                } //if
-            } //for
-            if (adder) {
-                if (temp == null) {
-                    temp = new Comparable [1];
-                    temp[0] = table2.tuples.get(row)[index];
-                } else {
-                    Comparable[] tempB = new Comparable [1];
-                    tempB[0] = table2.tuples.get(row)[index];
-                    temp = concat(temp, tempB);
-                } //if-else
-            } //if
-        } //for
-        return temp;
-    } //removeDupTup
-
-    /************************************************************************************
-     * Ensures the columns or attributes do not have the duplicates due to the natural join concatenation.
-     *
-     * @param columnNumbers the numbers with associated matching column names
-     * @param table2 the foreign table that was used for natural join
-     * @return  an updated array containing column info not currently found in this table
-     */
-    public String[]  removeDupAtr (int [] columnNumbers, Table table2)
-    {
-        int attributeSize = columnNumbers.length;
-        int attributeSize2 = table2.attribute.length;
-        //loops through all the tuples
-        String[] temp = null;
-        for (int index = 0; index < attributeSize2; index++) {
-            boolean adder = true;
-            for (int jIndex = 0; (jIndex < attributeSize) && adder; jIndex++) {
-                if (columnNumbers[jIndex] == index) {
-                    adder = false;
-                } //if
-            } //for
-            if (adder) {
-                if (temp == null) {
-                    temp = new String [1];
-                    temp[0] = table2.attribute[index];
-                } else {
-                    String[] tempB = new String [1];
-                    tempB[0] = table2.attribute[index];
-                    temp = concat(temp, tempB);
-                } //if-else
-            } //if
-        } //for
-        return temp;
-    } //removeDupAtr
-
-    /************************************************************************************
-     * Ensures domains do not have the duplicates due to the natural join concatenation.
-     *
-     * @param columnNumbers the numbers with associated matching column names
-     * @param table2 the foreign table that was used for natural join
-     * @return  an updated array containing domain info not currently found in this table
-     */
-    public Class[]  removeDupDom (int [] columnNumbers, Table table2)
-    {
-        int attributeSize = columnNumbers.length;
-        int attributeSize2 = table2.attribute.length;
-        //loops through all the tuples
-        Class[] temp = null;
-        for (int index = 0; index < attributeSize2; index++) {
-            boolean adder = true;
-            for (int jIndex = 0; (jIndex < attributeSize) && adder; jIndex++) {
-                if (columnNumbers[jIndex] == index) {
-                    adder = false;
-                } //if
-            } //for
-            if (adder) {
-                if (temp == null) {
-                    temp = new Class [1];
-                    temp[0] = table2.domain[index];
-                } else {
-                    Class[] tempB = new Class [1];
-                    tempB[0] = table2.domain[index];
-                    temp = concat(temp, tempB);
-                } //if-else
-            } //if
-        } //for
-        return temp;
-    } //removeDupDom
-
-    /****************************************************************************
-     * creates the index for the attributes given by retrieving the attributes and
-     * inserting into the B+ TreeMap
-     *
-     * @author Madhu Sudhan Reddy Chenchararpu - Project 2
-    */
-    public BpTreeMap<String, Comparable[]> createIndex(String attributes){
-
-        BpTreeMap<String,Comparable[]> btree = new BpTreeMap<>(String.class,Comparable[].class);
-
-        var attrs     = attributes.split (" ");
-        int[] colPos = match(attrs);
-
-        // retrieving attributes similar to the project operation
-        for(int i = 0 ; i < tuples.size() ; i++){
-            var newtuple = new Comparable[colPos.length];
-            for(int j = 0 ; j < colPos.length ;j++) {
-                int colContent = colPos[j];
-                newtuple[j] = tuples.get(i)[colContent];
-            }
-            //inserting into the b+tree
-            btree.put(Arrays.toString(newtuple),tuples.get(i));
-        }
-
-        var enSet = btree.entrySet ();
-        out.println ("EntrySet: " + enSet);
-        return btree;
-
-    }
-
 } // Table
-
-
 
