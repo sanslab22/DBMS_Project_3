@@ -32,14 +32,16 @@ public class TestTupleGenerator
         tupC[1] = (String)("name" + rand.nextInt(1000000));
         tupC[2] = (String)("address" + rand.nextInt(1000000));
         tupC[3] = (String)("status" + rand.nextInt(1000000));
-        int ref = (int)tupC[0] % size + 1;
         out.println("<<<<< TEST ONE >>>>>");
-        KeyType searching = new KeyType(tupC[0]);
+        DIndex dIndex = new DIndex(1001);
+        int ref = (int)tupC[0] % (size + 1);
+        dIndex.put (ref, testTable.insert (tupC));
         //prints operation
        // testTable.select(searching).print();
         //runs operation without printing
         var t0 = nanoTime ();
-        testTable.select(searching);
+        testTable.select(t -> t[testTable.col("id")].equals(tupC[0])).print();
+        // testTable.select(searching);
         return (nanoTime () - t0) / 1000;
     } //testOne
 
@@ -67,7 +69,7 @@ public class TestTupleGenerator
        // testTable.select(searching).print();
         //runs operation without printing
         var t0 = nanoTime ();
-        testTable.select(searching);
+        testTable.select(t -> t[testTable.col("name")].equals(tupC[1])).print();
         return (nanoTime () - t0) / 1000;
     } //testTwo
 
@@ -85,7 +87,7 @@ public class TestTupleGenerator
        // oTesterTable.i_join("studId", "id", testerTable).print();
         //does operation without printing
         var t0 = nanoTime ();
-        oTesterTable.i_join("studId", "id", testerTable);
+        oTesterTable.join("studId", "id", testerTable);
         return (nanoTime () - t0) / 1000;
     } //testThree
 
@@ -123,7 +125,7 @@ public class TestTupleGenerator
        // oTesterTable.i_join("studId", "id", studentTable).print();
         var t0 = nanoTime ();
         //does operation without printing
-        oTesterTable.i_join("studId", "id", studentTable);
+        oTesterTable.join("studId", "id", studentTable);
         return (nanoTime () - t0) / 1000;
     } //testFour
 
