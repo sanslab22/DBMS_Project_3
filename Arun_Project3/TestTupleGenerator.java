@@ -20,11 +20,11 @@ public class TestTupleGenerator
     /********************************************************************************
      * Run the first test for this table related to select search. This involves not having found a tuple in table.
      *
-     * @param studentTable the Student table to be used for this method
+     * @param testTable the test table to be used for this method
      * @param size the size of the table therefore the ref -1
      * @return a long representing the time it took to run select, in nanotime
      */
-    public static long testOne(Table studentTable, int size)
+    public static long testOne(Table testTable, int size)
     {
         var rand       = new Random();
         var tupC = new Comparable[4];
@@ -35,20 +35,23 @@ public class TestTupleGenerator
         int ref = (int)tupC[0] % size + 1;
         out.println("<<<<< TEST ONE >>>>>");
         KeyType searching = new KeyType(tupC[0]);
+        //prints operation
+       // testTable.select(searching).print();
+        //runs operation without printing
         var t0 = nanoTime ();
-        studentTable.select(searching).print();
+        testTable.select(searching);
         return (nanoTime () - t0) / 1000;
     } //testOne
 
     /********************************************************************************
      * Run the second test for this table related to select search. This involves having found a tuple in table.
      *
-     * @param studentTable the Student table to be used for this method
+     * @param testTable the Student table to be used for this method
      * @param dIndex the dIndex that is being used
      * @param size the size of the table therefore the ref -1
      * @return a long representing the time it took to run the select
      */
-    public static long testTwo(Table studentTable, DIndex dIndex, int size)
+    public static long testTwo(Table testTable, DIndex dIndex, int size)
     {
         var rand       = new Random ();
         var tupC = new Comparable[4];
@@ -57,11 +60,14 @@ public class TestTupleGenerator
         tupC[2] = (String)("address" + rand.nextInt(1000000));
         tupC[3] = (String)("status" + rand.nextInt(1000000));
         int ref = (int)tupC[0] % (size + 1);
-        dIndex.put (ref, studentTable.insert (tupC));
+        dIndex.put (ref, testTable.insert (tupC));
         KeyType searching = new KeyType(tupC[0]);
         out.println("<<<<< TEST TWO >>>>>");
+        //prints operation
+       // testTable.select(searching).print();
+        //runs operation without printing
         var t0 = nanoTime ();
-        studentTable.select(searching).print();
+        testTable.select(searching);
         return (nanoTime () - t0) / 1000;
     } //testTwo
 
@@ -75,8 +81,11 @@ public class TestTupleGenerator
     public static long testThree(Table testerTable, Table oTesterTable)
     {
         out.println("<<<<< TEST THREE >>>>>");
+        //prints operation
+       // oTesterTable.i_join("studId", "id", testerTable).print();
+        //does operation without printing
         var t0 = nanoTime ();
-        oTesterTable.i_join("studId", "id", testerTable).print();
+        oTesterTable.i_join("studId", "id", testerTable);
         return (nanoTime () - t0) / 1000;
     } //testThree
 
@@ -108,10 +117,13 @@ public class TestTupleGenerator
                 int ref = (int)resultTest[i][j][0] % (resultTest[i].length + 1);
                studentDIndex.put (ref, studentTable.insert(resultTest[i][j]));
             } // for
-            studentTable.print();
+         //   studentTable.print();
         } // for
+        //prints operation
+       // oTesterTable.i_join("studId", "id", studentTable).print();
         var t0 = nanoTime ();
-        oTesterTable.i_join("studId", "id", studentTable).print();
+        //does operation without printing
+        oTesterTable.i_join("studId", "id", studentTable);
         return (nanoTime () - t0) / 1000;
     } //testFour
 
@@ -183,14 +195,14 @@ public class TestTupleGenerator
         );
         var tables = new String [] { "Student", "Professor", "Course", "Teaching", "Transcript" };
         var tableObjs = new Table[] {studentTable,professorTable,courseTable,teachingTable,transcriptTable};
-        var tups   = new int [] { 10, 10, 10, 10, 10 };
+        var tups   = new int [] { 1000, 1000, 1000, 1000, 1000 };
         var  studentDIndex = new DIndex(tups[0] + 1);
         var  professorDIndex = new DIndex(tups[1] + 1);
         var  courseDIndex = new DIndex(tups[2] + 1);
         var  teachingDIndex = new DIndex(tups[3] + 1);
         var  transcriptDIndex = new DIndex(tups[4] + 1);
         var dIndexObjs = new DIndex[] {studentDIndex, professorDIndex, courseDIndex, teachingDIndex, transcriptDIndex};
-        //10000, 1000, 2000, 50000, 5000
+        // 1000, 2000,  5000, 7500, 10000, 25000, 50000
         var resultTest = test.generate (tups);
 
         for (var i = 0; i < resultTest.length; i++) {
@@ -209,7 +221,7 @@ public class TestTupleGenerator
             if (i >0) {
                 out.println("Test trail " + i);
                 testAverage[0] += testOne(tableObjs[0], tups[0]);
-                testAverage[1] += testTwo(tableObjs[1], dIndexObjs[0], tups[0]);
+                testAverage[1] += testTwo(tableObjs[0], dIndexObjs[0], tups[0]);
                 testAverage[2] += testThree(tableObjs[0], tableObjs[4]);
                 testAverage[3] += testFour(tableObjs[4], tups[0]);
             } //if
@@ -218,9 +230,12 @@ public class TestTupleGenerator
                 out.println("For test two average: " + (testAverage[1]/5));
                 out.println("For test three average: " + (testAverage[2]/5));
                 out.println("For test four average: " + (testAverage[3]/5));
+                long selecter = ((testAverage[0]/5) + (testAverage[1]/5)) / 2;
+                long joiner = ((testAverage[2]/5) + (testAverage[3]/5)) / 2;
+                out.println("For select average: " + selecter);
+                out.println("For joiner average: " + joiner);
             } //if
         } //for
     } // main
 
 } // TestTupleGenerator
-
