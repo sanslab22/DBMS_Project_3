@@ -40,7 +40,7 @@ public class TestTupleGenerator
         //runs operation without printing
         var t0 = nanoTime ();
         testTable.select(searching);
-        return (nanoTime () - t0) / 1000;
+        return (nanoTime () - t0) / 1000000;
     } //testOne
 
     /********************************************************************************
@@ -68,7 +68,7 @@ public class TestTupleGenerator
         //runs operation without printing
         var t0 = nanoTime ();
         testTable.select(searching);
-        return (nanoTime () - t0) / 1000;
+        return (nanoTime () - t0) / 1000000;
     } //testTwo
 
     /********************************************************************************
@@ -86,7 +86,7 @@ public class TestTupleGenerator
         //does operation without printing
         var t0 = nanoTime ();
         oTesterTable.i_join("studId", "id", testerTable);
-        return (nanoTime () - t0) / 1000;
+        return (nanoTime () - t0) / 1000000;
     } //testThree
 
     /********************************************************************************
@@ -124,7 +124,7 @@ public class TestTupleGenerator
         var t0 = nanoTime ();
         //does operation without printing
         oTesterTable.i_join("studId", "id", studentTable);
-        return (nanoTime () - t0) / 1000;
+        return (nanoTime () - t0) / 1000000;
     } //testFour
 
     /*************************************************************************************
