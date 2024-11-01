@@ -24,6 +24,8 @@ public class TestTupleGenerator
      * @param size the size of the table therefore the ref -1
      * @return a long representing the time it took to run select, in nanotime
      */
+
+    private static int tupsNum = 50000; 
     public static long testOne(Table testTable, int size)
     {
         var rand       = new Random();
@@ -33,7 +35,7 @@ public class TestTupleGenerator
         tupC[2] = (String)("address" + rand.nextInt(1000000));
         tupC[3] = (String)("status" + rand.nextInt(1000000));
         out.println("<<<<< TEST ONE >>>>>");
-        DIndex dIndex = new DIndex(1001);
+        DIndex dIndex = new DIndex(tupsNum + 1);
         int ref = (int)tupC[0] % (size + 1);
         dIndex.put (ref, testTable.insert (tupC));
         //prints operation
@@ -197,7 +199,7 @@ public class TestTupleGenerator
         );
         var tables = new String [] { "Student", "Professor", "Course", "Teaching", "Transcript" };
         var tableObjs = new Table[] {studentTable,professorTable,courseTable,teachingTable,transcriptTable};
-        var tups   = new int [] { 1000, 1000, 1000, 1000, 1000 };
+        var tups   = new int [] { tupsNum, tupsNum, tupsNum, tupsNum, tupsNum };
         var  studentDIndex = new DIndex(tups[0] + 1);
         var  professorDIndex = new DIndex(tups[1] + 1);
         var  courseDIndex = new DIndex(tups[2] + 1);
