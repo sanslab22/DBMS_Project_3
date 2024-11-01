@@ -199,6 +199,8 @@ public class TestTupleGenerator
         );
         var tables = new String [] { "Student", "Professor", "Course", "Teaching", "Transcript" };
         var tableObjs = new Table[] {studentTable,professorTable,courseTable,teachingTable,transcriptTable};
+     // tups handles the number of tuples generated for the tables
+     // test case: 10000, 20000, 30000, 40000, 50000
         var tups   = new int [] { 10000, 10000, 10000, 10000, 10000 };
         var  studentDIndex = new DIndex(tups[0] + 1);
         var  professorDIndex = new DIndex(tups[1] + 1);
@@ -206,13 +208,14 @@ public class TestTupleGenerator
         var  teachingDIndex = new DIndex(tups[3] + 1);
         var  transcriptDIndex = new DIndex(tups[4] + 1);
         var dIndexObjs = new DIndex[] {studentDIndex, professorDIndex, courseDIndex, teachingDIndex, transcriptDIndex};
-        // 1000, 2000,  5000, 7500, 10000, 25000, 50000
+     // generated the tuples to be inserted into the table
         var resultTest = test.generate (tups);
 
         for (var i = 0; i < resultTest.length; i++) {
             out.println (tables [i]);
             for (var j = 0; j < resultTest [i].length; j++) {
                 int ref = (int)resultTest[i][j][0] % (resultTest[i].length + 1);
+             // inserts tuples from resultTest into a table
                 dIndexObjs[i].put (ref, tableObjs[i].insert (resultTest[i][j]));
                 out.println ();
             } // for
@@ -230,6 +233,8 @@ public class TestTupleGenerator
                 testAverage[3] += testFour(tableObjs[4], tups[0]);
             } //if
             if (i == 5) {
+             // returns the time taken for each of the test cases in nanoseconds
+             // for graphing purposes, it is later converted to milliseconds in the GraphAnalysis.pdf as per instructions on elC
                 out.println("Test one - Select: " + (testAverage[0]/5) + " ns");
                 out.println("Test two - Indexed Select: " + (testAverage[1]/5) + " ns");
                 long selecter = ((testAverage[0]/5) + (testAverage[1]/5)) / 2;
