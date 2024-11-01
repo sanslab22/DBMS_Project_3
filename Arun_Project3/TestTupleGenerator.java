@@ -40,7 +40,7 @@ public class TestTupleGenerator
         //runs operation without printing
         var t0 = nanoTime ();
         testTable.select(searching);
-        return (nanoTime () - t0) / 1000000;
+        return (nanoTime () - t0);
     } //testOne
 
     /********************************************************************************
@@ -68,7 +68,7 @@ public class TestTupleGenerator
         //runs operation without printing
         var t0 = nanoTime ();
         testTable.select(searching);
-        return (nanoTime () - t0) / 1000000;
+        return (nanoTime () - t0);
     } //testTwo
 
     /********************************************************************************
@@ -86,7 +86,7 @@ public class TestTupleGenerator
         //does operation without printing
         var t0 = nanoTime ();
         oTesterTable.i_join("studId", "id", testerTable);
-        return (nanoTime () - t0) / 1000000;
+        return (nanoTime () - t0);
     } //testThree
 
     /********************************************************************************
@@ -124,7 +124,7 @@ public class TestTupleGenerator
         var t0 = nanoTime ();
         //does operation without printing
         oTesterTable.i_join("studId", "id", studentTable);
-        return (nanoTime () - t0) / 1000000;
+        return (nanoTime () - t0);
     } //testFour
 
     /*************************************************************************************
@@ -195,7 +195,7 @@ public class TestTupleGenerator
         );
         var tables = new String [] { "Student", "Professor", "Course", "Teaching", "Transcript" };
         var tableObjs = new Table[] {studentTable,professorTable,courseTable,teachingTable,transcriptTable};
-        var tups   = new int [] { 1000, 1000, 1000, 1000, 1000 };
+        var tups   = new int [] { 10000, 10000, 10000, 10000, 10000 };
         var  studentDIndex = new DIndex(tups[0] + 1);
         var  professorDIndex = new DIndex(tups[1] + 1);
         var  courseDIndex = new DIndex(tups[2] + 1);
@@ -226,14 +226,15 @@ public class TestTupleGenerator
                 testAverage[3] += testFour(tableObjs[4], tups[0]);
             } //if
             if (i == 5) {
-                out.println("For test one average: " + (testAverage[0]/5));
-                out.println("For test two average: " + (testAverage[1]/5));
-                out.println("For test three average: " + (testAverage[2]/5));
-                out.println("For test four average: " + (testAverage[3]/5));
+                out.println("Test one - Select: " + (testAverage[0]/5) + " ns");
+                out.println("Test two - Indexed Select: " + (testAverage[1]/5) + " ns");
                 long selecter = ((testAverage[0]/5) + (testAverage[1]/5)) / 2;
+                out.println("Average time taken for Select: " + selecter + " ns");
+                out.println("Test three - Equi Join: " + (testAverage[2]/5)+ " ns");
+                out.println("For test four average: " + (testAverage[3]/5)+ " ns");
                 long joiner = ((testAverage[2]/5) + (testAverage[3]/5)) / 2;
-                out.println("For select average: " + selecter);
-                out.println("For joiner average: " + joiner);
+                out.println("For joiner average: " + joiner+ " ns");
+
             } //if
         } //for
     } // main
