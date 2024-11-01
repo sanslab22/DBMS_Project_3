@@ -1,11 +1,11 @@
 
-/****************************************************************************************
+/* ***************************************************************************************
  * @file  Table.java
  *
  * @author   John Miller
  *
  * compile javac --enable-preview --release 21 *.java
- * run     java --enable-preview MovieDB
+ * run     java --enable-preview MovieDB    
  */
 
 import java.io.*;
@@ -23,7 +23,8 @@ import static java.lang.System.out;
  * Missing are update and delete data manipulation operators.
  */
 public class Table
-        implements Serializable
+       implements Serializable
+
 {
     /** Relative path for storage directory
      */
@@ -56,7 +57,7 @@ public class Table
      */
     private final List <Comparable []> tuples;
 
-    /** Primary key (the attributes forming).
+    /** Primary key (the attributes forming). 
      */
     private final String [] key;
 
@@ -90,11 +91,11 @@ public class Table
     /************************************************************************************
      * Concatenate two arrays of type T to form a new wider array.
      *
-     * @see http://stackoverflow.com/questions/80476/how-to-concatenate-two-arrays-in-java
+     * @see <a href="http://stackoverflow.com/questions/80476/how-to-concatenate-two-arrays-in-java">...</a>
      *
      * @param arr1  the first array
      * @param arr2  the second array
-     * @return  a wider array containing all the values from arr1 and arr2
+     * @return a wider array containing all the values from arr1 and arr2
      */
     public static <T> T [] concat (T [] arr1, T [] arr2)
     {
@@ -134,7 +135,9 @@ public class Table
      * @param _domain     the string containing attribute domains (data types)
      * @param _key        the primary key
      * @param _tuples     the list of tuples containing the data
-     */
+     */  
+
+
     public Table (String _name, String [] _attribute, Class [] _domain, String [] _key,
                   List <Comparable []> _tuples)
     {
@@ -183,7 +186,8 @@ public class Table
 
         List <Comparable []> rows = new ArrayList <> ();
 
-        //  T O   B E   I M P L E M E N T E D
+        //  T O   B E   I M P L E M E N T E D 
+
 
         return new Table (name + count++, attrs, colDomain, newKey, rows);
     } // project
@@ -201,8 +205,8 @@ public class Table
         out.println (STR."RA> \{name}.select (\{predicate})");
 
         return new Table (name + count++, attribute, domain, key,
-                tuples.stream ().filter (t -> predicate.test (t))
-                        .collect (Collectors.toList ()));
+                   tuples.stream ().filter (t -> predicate.test (t))
+                                   .collect (Collectors.toList ()));
     } // select
 
     /************************************************************************************
@@ -220,10 +224,13 @@ public class Table
 
         List <Comparable []> rows = new ArrayList <> ();
 
+        //  T O   B E   I M P L E M E N T E D
+
 
         var token = condition.split (" ");
         var colNo = col (token [0]);
         for (var t : tuples) {
+
             if (satisfies (t, colNo, token [1], token [2])) rows.add (t);
         } // for
 
@@ -241,10 +248,12 @@ public class Table
      * @return  whether the condition is satisfied
      */
     private boolean satisfies (Comparable [] t, int colNo, String op, String value)
+
     {
         var t_A = t[colNo];
         out.println (STR."satisfies: \{t_A} \{op} \{value}");
         var valt = switch (domain [colNo].getSimpleName ()) {      // type converted
+
             case "Byte"      -> Byte.valueOf (value);
             case "Character" -> value.charAt (0);
             case "Double"    -> Double.valueOf (value);
@@ -258,15 +267,16 @@ public class Table
         var comp = t_A.compareTo (valt);
 
         return switch (op) {
-            case "==" -> comp == 0;
-            case "!=" -> comp != 0;
-            case "<"  -> comp <  0;
-            case "<=" -> comp <= 0;
-            case ">"  -> comp >  0;
-            case ">=" -> comp >= 0;
-            default   -> false;
+        case "==" -> comp == 0;
+        case "!=" -> comp != 0;
+        case "<"  -> comp <  0;
+        case "<=" -> comp <= 0;
+        case ">"  -> comp >  0;
+        case ">=" -> comp >= 0;
+        default   -> false;
+
         }; // switch
-    } // satifies
+    } // satisfies
 
     /************************************************************************************
      * Select the tuples satisfying the given key predicate (key = value).  Use an index
@@ -302,6 +312,13 @@ public class Table
      */
     public Table union (Table table2)
     {
+        out.println (STR."RA> \{name}.union (\{table2.name})");
+        if (! compatible (table2)) return null;
+
+        //List <Comparable []> rows = new ArrayList <> ();
+
+        //  T O   B E   I M P L E M E N T E D 
+
         //Print out a message to let the users know that the 'Union Operation' is being performed
         System.out.println (STR."RA> \{name}.union (\{table2.name})");
 
@@ -348,6 +365,8 @@ public class Table
 
         List <Comparable []> rows = new ArrayList <> ();
 
+        //  T O   B E   I M P L E M E N T E D 
+
         Map<KeyType, Comparable[]> index = new HashMap<>();
         for(Comparable[] row2 : table2.tuples){
             var keyVal = new Comparable[key.length];
@@ -393,6 +412,8 @@ public class Table
         var t_attrs = attributes1.split (" ");
         var u_attrs = attributes2.split (" ");
         var rows    = new ArrayList <Comparable []> ();
+
+        //  T O   B E   I M P L E M E N T E D
         for (var t: tuples) {
             for(var j: table2.tuples) {
 
@@ -419,6 +440,7 @@ public class Table
         }
 
         return new Table (name + count++, concat (attribute, table2.attribute),
+
                 concat (domain, table2.domain), key, rows);
     } // join
 
@@ -438,6 +460,9 @@ public class Table
         out.println (STR."RA> \{name}.join (\{condition}, \{table2.name})");
 
         var rows = new ArrayList <Comparable []> ();
+
+        //  T O   B E   I M P L E M E N T E D
+
 
         //Next we split the condition into three parts: attr1, attr2 and operator
         String[] conditionParts = condition.split(" ");
@@ -499,6 +524,7 @@ public class Table
                 }
             }
         }
+
         // I M P L E M E N T E D
 
         return new Table (name + count++, concat (attribute, table2.attribute),
@@ -521,6 +547,8 @@ public class Table
         var t_attrs = attributes1.split(" ");
         var u_attrs = attributes2.split(" ");
         var rows = new ArrayList<Comparable[]>();
+
+        // T O B E I M P L E M E N T E D
 
         // To check whether primary key and foreign key relationship is satisfied or not
         int count1 = 0;
@@ -592,11 +620,12 @@ public class Table
 
         var rows = new ArrayList <Comparable []> ();
 
-        //  T O   B E   I M P L E M E N T E D
+        //  T O   B E   I M P L E M E N T E D 
 
         // FIX - eliminate duplicate columns
         return new Table (name + count++, concat (attribute, table2.attribute),
-                concat (domain, table2.domain), key, rows);
+                                          concat (domain, table2.domain), key, rows);
+
     } // join
 
     /************************************************************************************
@@ -608,7 +637,8 @@ public class Table
     public int col (String attr)
     {
         for (var i = 0; i < attribute.length; i++) {
-            if (attr.equals (attribute [i])) return i;
+           if (attr.equals (attribute [i])) return i;
+
         } // for
 
         return -1;       // -1 => not found
@@ -707,7 +737,7 @@ public class Table
     } // printIndex
 
     /************************************************************************************
-     * Load the table with the given name into memory.
+     * Load the table with the given name into memory. 
      *
      * @param name  the name of the table to load
      */
@@ -798,7 +828,7 @@ public class Table
      *
      * @param t       the tuple to extract from
      * @param column  the array of column names
-     * @return  a smaller tuple extracted from tuple t
+     * @return  a smaller tuple extracted from tuple t 
      */
     private Comparable [] extract (Comparable [] t, String [] column)
     {
@@ -810,15 +840,15 @@ public class Table
 
     /************************************************************************************
      * Check the size of the tuple (number of elements in array) as well as the type of
-     * each value to ensure it is from the right domain.
+     * each value to ensure it is from the right domain. 
      *
      * @param t  the tuple as a array of attribute values
      * @return  whether the tuple has the right size and values that comply
      *          with the given domains
      */
     private boolean typeCheck (Comparable [] t)
-    {
-        //  T O   B E   I M P L E M E N T E D
+    { 
+        //  T O   B E   I M P L E M E N T E D 
 
         return true;      // change once implemented
     } // typeCheck
