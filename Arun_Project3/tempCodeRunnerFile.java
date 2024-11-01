@@ -1,0 +1,1 @@
+tableObjs[i].insert (resultTest[i][j])
