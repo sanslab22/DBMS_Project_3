@@ -24,6 +24,7 @@ import static java.lang.System.out;
  */
 public class Table
        implements Serializable
+
 {
     /** Relative path for storage directory
      */
@@ -78,12 +79,12 @@ public class Table
     private static Map <KeyType, Comparable []> makeMap ()
     {
         return switch (mType) {
-        case NO_MAP      -> null;
-        case TREE_MAP    -> new TreeMap <> ();
-        case HASH_MAP    -> new HashMap <> ();
-      //  case LINHASH_MAP -> new LinHashMap <> (KeyType.class, Comparable [].class);
-        case BPTREE_MAP  -> new BpTreeMap <> (KeyType.class, Comparable [].class);
-        default          -> null;
+            case NO_MAP      -> null;
+            case TREE_MAP    -> new TreeMap <> ();
+            case HASH_MAP    -> new HashMap <> ();
+            //  case LINHASH_MAP -> new LinHashMap <> (KeyType.class, Comparable [].class);
+            case BPTREE_MAP  -> new BpTreeMap <> (KeyType.class, Comparable [].class);
+            default          -> null;
         }; // switch
     } // makeMap
 
@@ -114,7 +115,7 @@ public class Table
      * @param _attribute  the string containing attributes names
      * @param _domain     the string containing attribute domains (data types)
      * @param _key        the primary key
-     */  
+     */
     public Table (String _name, String [] _attribute, Class [] _domain, String [] _key)
     {
         name      = _name;
@@ -135,6 +136,8 @@ public class Table
      * @param _key        the primary key
      * @param _tuples     the list of tuples containing the data
      */  
+
+
     public Table (String _name, String [] _attribute, Class [] _domain, String [] _key,
                   List <Comparable []> _tuples)
     {
@@ -185,6 +188,7 @@ public class Table
 
         //  T O   B E   I M P L E M E N T E D 
 
+
         return new Table (name + count++, attrs, colDomain, newKey, rows);
     } // project
 
@@ -222,10 +226,12 @@ public class Table
 
         //  T O   B E   I M P L E M E N T E D
 
+
         var token = condition.split (" ");
         var colNo = col (token [0]);
         for (var t : tuples) {
-            if (satifies (t, colNo, token [1], token [2])) rows.add (t);
+
+            if (satisfies (t, colNo, token [1], token [2])) rows.add (t);
         } // for
 
         return new Table (name + count++, attribute, domain, key, rows);
@@ -242,19 +248,21 @@ public class Table
      * @return  whether the condition is satisfied
      */
     private boolean satifies (Comparable [] t, int colNo, String op, String value)
+
     {
         var t_A = t[colNo];
         out.println (STR."satisfies: \{t_A} \{op} \{value}");
         var valt = switch (domain [colNo].getSimpleName ()) {      // type converted
-        case "Byte"      -> Byte.valueOf (value);
-        case "Character" -> value.charAt (0);
-        case "Double"    -> Double.valueOf (value);
-        case "Float"     -> Float.valueOf (value);
-        case "Integer"   -> Integer.valueOf (value);
-        case "Long"      -> Long.valueOf (value);
-        case "Short"     -> Short.valueOf (value);
-        case "String"    -> value;
-        default          -> value;
+
+            case "Byte"      -> Byte.valueOf (value);
+            case "Character" -> value.charAt (0);
+            case "Double"    -> Double.valueOf (value);
+            case "Float"     -> Float.valueOf (value);
+            case "Integer"   -> Integer.valueOf (value);
+            case "Long"      -> Long.valueOf (value);
+            case "Short"     -> Short.valueOf (value);
+            case "String"    -> value;
+            default          -> value;
         }; // switch
         var comp = t_A.compareTo (valt);
 
@@ -266,6 +274,7 @@ public class Table
         case ">"  -> comp >  0;
         case ">=" -> comp >= 0;
         default   -> false;
+
         }; // switch
     } // satifies
 
@@ -310,6 +319,33 @@ public class Table
 
         //  T O   B E   I M P L E M E N T E D 
 
+        //Print out a message to let the users know that the 'Union Operation' is being performed
+        System.out.println (STR."RA> \{name}.union (\{table2.name})");
+
+        //Check if the tables are compatible and if not then return a null
+        if (! compatible (table2)) return null;
+
+        //Create a new list to store the rows of the resulting union
+        List <Comparable []> rows = new ArrayList <> ();
+
+
+        //Add all the rows from the current (this) table to the new list
+        for (Comparable [] row : this.tuples) {
+            rows.add (row);
+        } //for
+
+        //Add all the rows from table2 to the new list
+        for (Comparable [] row2 : table2.tuples) {
+            var keyVal = new Comparable [key.length];
+            var cols   = match (key);
+            for (var j = 0; j < keyVal.length; j++) keyVal [j] = row2 [cols [j]];
+            KeyType compareR = new KeyType(keyVal);
+            //checks if tuple is not already found in table1
+            if (this.index.get(compareR) == null) {
+                rows.add (row2);
+            } //if
+        } //for
+        // Create and return a new Table object with the combined rows
         return new Table (name + count++, attribute, domain, key, rows);
     } // union
 
@@ -331,6 +367,28 @@ public class Table
 
         //  T O   B E   I M P L E M E N T E D 
 
+        Map<KeyType, Comparable[]> index = new HashMap<>();
+        for(Comparable[] row2 : table2.tuples){
+            var keyVal = new Comparable[key.length];
+            var cols = match(key);
+            for(var j = 0; j < keyVal.length; j++){
+                keyVal [j] = row2[cols [j]];
+            }
+            KeyType keyType = new KeyType(keyVal);
+            index.put(keyType, row2);
+        }
+
+        for(Comparable[] row : this.tuples){
+            var keyVal = new Comparable[key.length];
+            var cols = match(key);
+            for(var j = 0; j < keyVal.length; j++){
+                keyVal [j] = row[cols [j]];
+            }
+            KeyType keyType = new KeyType(keyVal);
+            if (index.get(keyType) == null){
+                rows.add(row);
+            }
+        }
         return new Table (name + count++, attribute, domain, key, rows);
     } // minus
 
@@ -382,7 +440,8 @@ public class Table
         }
 
         return new Table (name + count++, concat (attribute, table2.attribute),
-                                          concat (domain, table2.domain), key, rows);
+
+                concat (domain, table2.domain), key, rows);
     } // join
 
     /************************************************************************************
@@ -404,6 +463,7 @@ public class Table
 
         //  T O   B E   I M P L E M E N T E D
 
+
         //Next we split the condition into three parts: attr1, attr2 and operator
         String[] conditionParts = condition.split(" ");
 
@@ -414,6 +474,7 @@ public class Table
         // We find the index values of the attributes to ensure its location within a tuple
         int index1 = col(attr1);
         int index2 = table2.col(attr2);
+
         // Nested Loop
         for (var tuple1 : tuples) {
             for (var tuple2 : table2.tuples) {
@@ -441,6 +502,7 @@ public class Table
                     default:
                         throw new IllegalArgumentException ();
                 }
+
                 if (condsatisfied){
                     // Join the tuples by creating a new array to hold the combined tuple and add the concated result
                     Comparable[] resultTuple = concat(tuple1, tuple2);
@@ -448,6 +510,7 @@ public class Table
                 }
             }
         }
+
         // Handling disambiguation
         String[] combined_arr_Attributes = concat(attribute, table2.attribute); // Create a combined array of attributes
 
@@ -462,8 +525,10 @@ public class Table
             }
         }
 
+        // I M P L E M E N T E D
+
         return new Table (name + count++, concat (attribute, table2.attribute),
-                                          concat (domain, table2.domain), key, rows);
+                concat (domain, table2.domain), key, rows);
     } // join
 
     /************************************************************************************
@@ -484,6 +549,7 @@ public class Table
         var rows = new ArrayList<Comparable[]>();
 
         // T O B E I M P L E M E N T E D
+
         // To check whether primary key and foreign key relationship is satisfied or not
         int count1 = 0;
         for (int i = 0; i < t_attrs.length; i++) {
@@ -559,6 +625,7 @@ public class Table
         // FIX - eliminate duplicate columns
         return new Table (name + count++, concat (attribute, table2.attribute),
                                           concat (domain, table2.domain), key, rows);
+
     } // join
 
     /************************************************************************************
@@ -571,6 +638,7 @@ public class Table
     {
         for (var i = 0; i < attribute.length; i++) {
            if (attr.equals (attribute [i])) return i;
+
         } // for
 
         return -1;       // -1 => not found
