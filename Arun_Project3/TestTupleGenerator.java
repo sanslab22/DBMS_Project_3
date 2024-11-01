@@ -19,6 +19,7 @@ public class TestTupleGenerator
 {
     /********************************************************************************
      * Run the first test for this table related to select search. This involves not having found a tuple in table.
+     * Test case for regular select operation WITHOUT Indexing.
      *
      * @param testTable the test table to be used for this method
      * @param size the size of the table therefore the ref -1
@@ -45,6 +46,7 @@ public class TestTupleGenerator
 
     /********************************************************************************
      * Run the second test for this table related to select search. This involves having found a tuple in table.
+     * Test case for indexed select operation using DIndex to index tuples.
      *
      * @param testTable the Student table to be used for this method
      * @param dIndex the dIndex that is being used
