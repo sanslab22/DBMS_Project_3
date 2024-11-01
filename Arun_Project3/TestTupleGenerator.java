@@ -75,6 +75,7 @@ public class TestTupleGenerator
 
     /********************************************************************************
      * Run the third test for this table related to join. This involves having found all tuples to join.
+     * Performs an equi join on testerTable and oTesterTable assuming that the tables have data in them. 
      *
      * @param testerTable the first tester table to be used for this method
      * @param oTesterTable the other tester table to be used for this method
@@ -93,6 +94,7 @@ public class TestTupleGenerator
 
     /********************************************************************************
      * Run the fourth test for this table related to join. This involves having found all tuples to join.
+     * Performs an indexed equi-join with the help of DIndex to assign indicies to all the generated tuples
      *
      * @param oTesterTable the other tester table to be used for this method
      * @param size the size of the table to be joined (original table)
