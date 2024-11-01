@@ -1,5 +1,5 @@
 
-/****************************************************************************************
+/* ***************************************************************************************
  * @file  Table.java
  *
  * @author   John Miller
@@ -91,11 +91,11 @@ public class Table
     /************************************************************************************
      * Concatenate two arrays of type T to form a new wider array.
      *
-     * @see http://stackoverflow.com/questions/80476/how-to-concatenate-two-arrays-in-java
+     * @see <a href="http://stackoverflow.com/questions/80476/how-to-concatenate-two-arrays-in-java">...</a>
      *
      * @param arr1  the first array
      * @param arr2  the second array
-     * @return  a wider array containing all the values from arr1 and arr2
+     * @return a wider array containing all the values from arr1 and arr2
      */
     public static <T> T [] concat (T [] arr1, T [] arr2)
     {
@@ -247,7 +247,7 @@ public class Table
      * @param value  the value to compare with (must be converted, String -> domain type)
      * @return  whether the condition is satisfied
      */
-    private boolean satifies (Comparable [] t, int colNo, String op, String value)
+    private boolean satisfies (Comparable [] t, int colNo, String op, String value)
 
     {
         var t_A = t[colNo];
@@ -276,7 +276,7 @@ public class Table
         default   -> false;
 
         }; // switch
-    } // satifies
+    } // satisfies
 
     /************************************************************************************
      * Select the tuples satisfying the given key predicate (key = value).  Use an index
@@ -315,7 +315,7 @@ public class Table
         out.println (STR."RA> \{name}.union (\{table2.name})");
         if (! compatible (table2)) return null;
 
-        List <Comparable []> rows = new ArrayList <> ();
+        //List <Comparable []> rows = new ArrayList <> ();
 
         //  T O   B E   I M P L E M E N T E D 
 
