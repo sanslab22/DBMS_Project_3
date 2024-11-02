@@ -67,7 +67,7 @@ public class Table
 
     /** The supported map types.
      */
-    private enum MapType { NO_MAP, TREE_MAP, HASH_MAP, LINHASH_MAP, BPTREE_MAP }
+    private enum MapType { NO_MAP, TREE_MAP, HASH_MAP, BPTREE_MAP }
 
     /** The map type to be used for indices.  Change as needed.
      */
@@ -181,15 +181,41 @@ public class Table
     {
         out.println ("RA> " + name + ".project (" + attributes + ")");
         var attrs     = attributes.split (" ");
+        int[] colPos = match(attrs);
         var colDomain = extractDom (match (attrs), domain);
         var newKey    = (Arrays.asList (attrs).containsAll (Arrays.asList (key))) ? key : attrs;
 
         List <Comparable []> rows = new ArrayList <> ();
 
-        //  T O   B E   I M P L E M E N T E D 
 
+        // check if the given column are valid
+        for(int col : colPos){
+            if (col == -1){
+                out.println(" you are given an invalid attributes please check the attributes");
+                return new Table (name + count++, attrs, colDomain, newKey, rows);
+            }
+        }
 
-        return new Table (name + count++, attrs, colDomain, newKey, rows);
+        // table to store the resulting project table with its attributes, domain and key
+        Table newTable = new Table (name + count++, attrs, colDomain, newKey);
+        for(int i = 0 ; i < tuples.size() ; i++){
+            // create new tuple with projected column
+            var newtuple = new Comparable[colPos.length];
+            for(int j = 0 ; j < colPos.length ;j++) {
+                int colContent = colPos[j];
+                // copy the value of from original tuple to newtuple
+                newtuple[j] = tuples.get(i)[colContent];
+            }
+            KeyType compareR = new KeyType(newtuple);
+            // insert newtuple into the newTable if its not in the index
+            // eliminates duplicates
+            if (newTable.index.get(compareR) == null) {
+                newTable.insert(newtuple);
+            }
+        }
+
+        return newTable;
+       // return new Table (name + count++, attrs, colDomain, newKey, rows);
     } // project
 
     /************************************************************************************
@@ -223,9 +249,6 @@ public class Table
         out.println (STR."RA> \{name}.select (\{condition})");
 
         List <Comparable []> rows = new ArrayList <> ();
-
-        //  T O   B E   I M P L E M E N T E D
-
 
         var token = condition.split (" ");
         var colNo = col (token [0]);
@@ -291,7 +314,6 @@ public class Table
 
         List <Comparable []> rows = new ArrayList <> ();
 
-        //  T O   B E   I M P L E M E N T E D  - Project 2
         //Find the tuples associated with the keyVal
         Comparable[] tups = index.get(keyVal);
 
@@ -312,13 +334,6 @@ public class Table
      */
     public Table union (Table table2)
     {
-        out.println (STR."RA> \{name}.union (\{table2.name})");
-        if (! compatible (table2)) return null;
-
-        //List <Comparable []> rows = new ArrayList <> ();
-
-        //  T O   B E   I M P L E M E N T E D 
-
         //Print out a message to let the users know that the 'Union Operation' is being performed
         System.out.println (STR."RA> \{name}.union (\{table2.name})");
 
@@ -365,19 +380,23 @@ public class Table
 
         List <Comparable []> rows = new ArrayList <> ();
 
-        //  T O   B E   I M P L E M E N T E D 
-
         Map<KeyType, Comparable[]> index = new HashMap<>();
+
+        // loop through table2 and set the index
         for(Comparable[] row2 : table2.tuples){
             var keyVal = new Comparable[key.length];
             var cols = match(key);
             for(var j = 0; j < keyVal.length; j++){
+                // keyVal stores the values from the current row from relevant columns
                 keyVal [j] = row2[cols [j]];
             }
             KeyType keyType = new KeyType(keyVal);
+            // key and row is inserted into a HashMap index
             index.put(keyType, row2);
         }
 
+        // loop through each row, check if the rows are in 'this' but not in table2
+        // handling duplicates
         for(Comparable[] row : this.tuples){
             var keyVal = new Comparable[key.length];
             var cols = match(key);
@@ -412,8 +431,6 @@ public class Table
         var t_attrs = attributes1.split (" ");
         var u_attrs = attributes2.split (" ");
         var rows    = new ArrayList <Comparable []> ();
-
-        //  T O   B E   I M P L E M E N T E D
         for (var t: tuples) {
             for(var j: table2.tuples) {
 
@@ -440,7 +457,6 @@ public class Table
         }
 
         return new Table (name + count++, concat (attribute, table2.attribute),
-
                 concat (domain, table2.domain), key, rows);
     } // join
 
@@ -460,9 +476,6 @@ public class Table
         out.println (STR."RA> \{name}.join (\{condition}, \{table2.name})");
 
         var rows = new ArrayList <Comparable []> ();
-
-        //  T O   B E   I M P L E M E N T E D
-
 
         //Next we split the condition into three parts: attr1, attr2 and operator
         String[] conditionParts = condition.split(" ");
@@ -524,7 +537,6 @@ public class Table
                 }
             }
         }
-
         // I M P L E M E N T E D
 
         return new Table (name + count++, concat (attribute, table2.attribute),
@@ -548,8 +560,6 @@ public class Table
         var u_attrs = attributes2.split(" ");
         var rows = new ArrayList<Comparable[]>();
 
-        // T O B E I M P L E M E N T E D
-
         // To check whether primary key and foreign key relationship is satisfied or not
         int count1 = 0;
         for (int i = 0; i < t_attrs.length; i++) {
@@ -563,6 +573,7 @@ public class Table
                 count2++;
             }
         }
+
         // Perform join on valid key types
         if (count1 == t_attrs.length && count2 == u_attrs.length) {
             for (int i = 0; i < tuples.size(); i++) {
@@ -591,6 +602,7 @@ public class Table
         } else {
             System.out.println("ERROR:  you are given an invalid attributes please check the attributes");
         }
+
         // adding ambiguous column name with 2
         for (int i = 0; i < attribute.length; i++) {
             for (int j = 0; j < table2.attribute.length; j++) {
@@ -620,7 +632,7 @@ public class Table
 
         var rows = new ArrayList <Comparable []> ();
 
-        //  T O   B E   I M P L E M E N T E D 
+        //  NOT USED FOR PROJECT 3
 
         // FIX - eliminate duplicate columns
         return new Table (name + count++, concat (attribute, table2.attribute),
@@ -847,10 +859,18 @@ public class Table
      *          with the given domains
      */
     private boolean typeCheck (Comparable [] t)
-    { 
-        //  T O   B E   I M P L E M E N T E D 
+    {
+        for(int i = 0 ; i < this.domain.length; i++){
+            if(t[i] != null) {
+                String tuple_domain = t[i].getClass().getName();
+                String attribute_domain = this.domain[i].getName();
 
-        return true;      // change once implemented
+                if (!tuple_domain.equals(attribute_domain)) {
+                    return false;
+                }
+            }
+        }
+        return true;
     } // typeCheck
 
     /************************************************************************************
