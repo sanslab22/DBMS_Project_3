@@ -48,7 +48,7 @@ Before you begin, ensure you have met the following requirements:
 2. Open the project in you preferred IDE with the root folder named `Arun_Project3`
 3. Modify the MapType used for testing in `Table.java`
       `private static final MapType mType = MapType.<INSERT MAP TYPE>;`
-4. Navigate to `TestTupleGenerator.java`
+4. Navigate to `TestTupleGenerator.java` and modify the number of tuples to be generated
        `private static int numTuples = 10000;`
        `var tups   = new int [] { numTuples, numTuples, numTuples, numTuples, numTuples };`
 
