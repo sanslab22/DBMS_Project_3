@@ -17,11 +17,17 @@ import static java.lang.System.out;
  */
 public class TestTupleGenerator
 {
+    // initializing the number of tuples to be inserted into the table
+    // PLEASE MODIFY THIS FOR TESTING PURPOSES
     private static int numTuples = 10000;
     
     /********************************************************************************
      * Run the first test for this table related to select search. This involves not having found a tuple in table.
      * Test case for regular select operation WITHOUT Indexing.
+     *
+     * @author Fidel Arroyo - Test case for all except NO_MAP
+     * @author Tristan Dominy - Test Case for NO_MAP
+     * @author Sanjana Arun - NO_MAP or not logic
      *
      * @param testTable the test table to be used for this method
      * @param size the size of the table therefore the ref -1
@@ -37,18 +43,38 @@ public class TestTupleGenerator
         tupC[3] = (String)("status" + rand.nextInt(1000000));
         int ref = (int)tupC[0] % size + 1;
         out.println("<<<<< TEST ONE >>>>>");
-        KeyType searching = new KeyType(tupC[0]);
-        //prints operation
-       // testTable.select(searching).print();
-        //runs operation without printing
-        var t0 = nanoTime ();
-        testTable.select(searching);
-        return (nanoTime () - t0);
+
+        // Depending on whether or not NO_MAP is used, it runs a different select operation
+        Table.MapType MapType = null;
+        if (Table.getMapType() == MapType.NO_MAP) {
+            DIndex dIndex = new DIndex(numTuples + 1);
+            dIndex.put(ref, testTable.insert(tupC));
+            //prints operation
+            // testTable.select(searching).print();
+            //runs operation without printing
+            var t0 = nanoTime();
+            testTable.select(t -> t[testTable.col("id")].equals(tupC[0])).print();
+            // testTable.select(searching);
+            return (nanoTime() - t0) / 1000;
+        }
+        else {
+            KeyType searching = new KeyType(tupC[0]);
+            //prints operation
+            // testTable.select(searching).print();
+            //runs operation without printing
+            var t0 = nanoTime();
+            testTable.select(searching);
+            return (nanoTime() - t0);
+        }
     } //testOne
 
     /********************************************************************************
      * Run the second test for this table related to select search. This involves having found a tuple in table.
      * Test case for indexed select operation using DIndex to index tuples.
+     *
+     * @author Fidel Arroyo - Test case for all except NO_MAP
+     * @author Tristan Dominy - Test Case for NO_MAP
+     * @author Sanjana Arun - NO_MAP or not logic
      *
      * @param testTable the Student table to be used for this method
      * @param dIndex the dIndex that is being used
@@ -70,14 +96,27 @@ public class TestTupleGenerator
         //prints operation
        // testTable.select(searching).print();
         //runs operation without printing
+
+        // Depending on whether or not NO_MAP is used, it runs an indexed select operation
+        Table.MapType MapType = null;
+
         var t0 = nanoTime ();
-        testTable.select(searching);
+        if (Table.getMapType() == MapType.NO_MAP) {
+            testTable.select(t -> t[testTable.col("name")].equals(tupC[1])).print();
+        }
+        else {
+            testTable.select(searching);
+        }
         return (nanoTime () - t0);
     } //testTwo
 
     /********************************************************************************
      * Run the third test for this table related to join. This involves having found all tuples to join.
      * Performs an equi join on testerTable and oTesterTable assuming that the tables have data in them. 
+     *
+     * @author Fidel Arroyo - Test case for all except NO_MAP
+     * @author Tristan Dominy - Test Case for NO_MAP
+     * @author Sanjana Arun - NO_MAP or not logic
      *
      * @param testerTable the first tester table to be used for this method
      * @param oTesterTable the other tester table to be used for this method
@@ -89,14 +128,28 @@ public class TestTupleGenerator
         //prints operation
        // oTesterTable.i_join("studId", "id", testerTable).print();
         //does operation without printing
+
+        // Depending on whether or not NO_MAP is used, it runs a different join operation
+        Table.MapType MapType = null;
+
         var t0 = nanoTime ();
-        oTesterTable.i_join("studId", "id", testerTable);
+
+        if (Table.getMapType() == MapType.NO_MAP) {
+            oTesterTable.join("studId", "id", testerTable);
+        }
+        else {
+            oTesterTable.i_join("studId", "id", testerTable);
+        }
         return (nanoTime () - t0);
     } //testThree
 
     /********************************************************************************
      * Run the fourth test for this table related to join. This involves having found all tuples to join.
      * Performs an indexed equi-join with the help of DIndex to assign indicies to all the generated tuples
+     *
+     * @author Fidel Arroyo - Test case for all except NO_MAP
+     * @author Tristan Dominy - Test Case for NO_MAP
+     * @author Sanjana Arun - NO_MAP or not logic
      *
      * @param oTesterTable the other tester table to be used for this method
      * @param size the size of the table to be joined (original table)
@@ -127,15 +180,27 @@ public class TestTupleGenerator
         } // for
         //prints operation
        // oTesterTable.i_join("studId", "id", studentTable).print();
+
+        // Depending on whether or not NO_MAP is used, it runs an indexed join operation
+        Table.MapType MapType = null;
+
         var t0 = nanoTime ();
-        //does operation without printing
-        oTesterTable.i_join("studId", "id", studentTable);
+        if (Table.getMapType() == MapType.NO_MAP) {
+            oTesterTable.join("studId", "id", studentTable);
+        }
+        else {
+            oTesterTable.i_join("studId", "id", studentTable);
+        };
         return (nanoTime () - t0);
     } //testFour
 
     /*************************************************************************************
      * The main method is the driver for TestGenerator.
      * @param args  the command-line arguments
+     
+     * @author Fidel Arroyo
+     * @author Tristan Dominy
+     * @author Sanjana Arun
      */
     public static void main (String [] args)
     {

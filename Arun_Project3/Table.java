@@ -67,11 +67,12 @@ public class Table
 
     /** The supported map types.
      */
-    private enum MapType { NO_MAP, TREE_MAP, HASH_MAP, BPTREE_MAP }
+    public enum MapType { NO_MAP, TREE_MAP, HASH_MAP, BPTREE_MAP }
 
     /** The map type to be used for indices.  Change as needed.
+     * PLEASE MODIFY THIS FOR TESTING PURPOSES
      */
-    private static final MapType mType = MapType.BPTREE_MAP;
+    private static final MapType mType = MapType.NO_MAP;
 
     /************************************************************************************
      * Make a map (index) given the MapType.
@@ -104,6 +105,16 @@ public class Table
         return result;
     } // concat
 
+    /************************************************************************************
+     * Returns the Map Types used in Table.java
+     * Used to determine what select or join operation to use depending on if NO_MAP or a
+     * different Map Data Structure is initialized
+     *
+     * @author Sanjana Arun
+     */
+    public static MapType getMapType(){
+        return mType;
+    }
     //-----------------------------------------------------------------------------------
     // Constructors
     //-----------------------------------------------------------------------------------
