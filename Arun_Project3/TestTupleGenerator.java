@@ -23,6 +23,8 @@ public class TestTupleGenerator
      * Run the first test for this table related to select search. This involves not having found a tuple in table.
      * Test case for regular select operation WITHOUT Indexing.
      *
+     * @author Fidel Arroyo
+     *
      * @param testTable the test table to be used for this method
      * @param size the size of the table therefore the ref -1
      * @return a long representing the time it took to run select, in nanotime
@@ -49,6 +51,8 @@ public class TestTupleGenerator
     /********************************************************************************
      * Run the second test for this table related to select search. This involves having found a tuple in table.
      * Test case for indexed select operation using DIndex to index tuples.
+     *
+     * @author Fidel Arroyo
      *
      * @param testTable the Student table to be used for this method
      * @param dIndex the dIndex that is being used
@@ -79,6 +83,8 @@ public class TestTupleGenerator
      * Run the third test for this table related to join. This involves having found all tuples to join.
      * Performs an equi join on testerTable and oTesterTable assuming that the tables have data in them. 
      *
+     * @author Fidel Arroyo
+     *
      * @param testerTable the first tester table to be used for this method
      * @param oTesterTable the other tester table to be used for this method
      * @return a long representing the time it took to run index Join
@@ -97,6 +103,8 @@ public class TestTupleGenerator
     /********************************************************************************
      * Run the fourth test for this table related to join. This involves having found all tuples to join.
      * Performs an indexed equi-join with the help of DIndex to assign indicies to all the generated tuples
+     *
+     * @author Fidel Arroyo
      *
      * @param oTesterTable the other tester table to be used for this method
      * @param size the size of the table to be joined (original table)
@@ -136,6 +144,10 @@ public class TestTupleGenerator
     /*************************************************************************************
      * The main method is the driver for TestGenerator.
      * @param args  the command-line arguments
+     
+     * @author Fidel Arroyo
+     * @author Tristan Dominy
+     * @author Sanjana Arun
      */
     public static void main (String [] args)
     {
