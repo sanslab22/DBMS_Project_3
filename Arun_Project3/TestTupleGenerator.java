@@ -17,6 +17,8 @@ import static java.lang.System.out;
  */
 public class TestTupleGenerator
 {
+    private static int numTuples = 10000;
+
     /********************************************************************************
      * Run the first test for this table related to select search. This involves not having found a tuple in table.
      * Test case for regular select operation WITHOUT Indexing.
@@ -199,7 +201,7 @@ public class TestTupleGenerator
         );
         var tables = new String [] { "Student", "Professor", "Course", "Teaching", "Transcript" };
         var tableObjs = new Table[] {studentTable,professorTable,courseTable,teachingTable,transcriptTable};
-        var tups   = new int [] { 10000, 10000, 10000, 10000, 10000 };
+        var tups   = new int [] { numTuples, numTuples, numTuples, numTuples, numTuples };
         var  studentDIndex = new DIndex(tups[0] + 1);
         var  professorDIndex = new DIndex(tups[1] + 1);
         var  courseDIndex = new DIndex(tups[2] + 1);
@@ -213,6 +215,7 @@ public class TestTupleGenerator
             out.println (tables [i]);
             for (var j = 0; j < resultTest [i].length; j++) {
                 int ref = (int)resultTest[i][j][0] % (resultTest[i].length + 1);
+                // inserting generated tuples from resultTest into the table object
                 dIndexObjs[i].put (ref, tableObjs[i].insert (resultTest[i][j]));
                 out.println ();
             } // for
@@ -235,9 +238,9 @@ public class TestTupleGenerator
                 long selecter = ((testAverage[0]/5) + (testAverage[1]/5)) / 2;
                 out.println("Average time taken for Select: " + selecter + " ns");
                 out.println("Test three - Equi Join: " + (testAverage[2]/5)+ " ns");
-                out.println("For test four average: " + (testAverage[3]/5)+ " ns");
+                out.println("Test four - Indexed Join: " + (testAverage[3]/5)+ " ns");
                 long joiner = ((testAverage[2]/5) + (testAverage[3]/5)) / 2;
-                out.println("For joiner average: " + joiner+ " ns");
+                out.println("Average time taken for Join: " + joiner+ " ns");
 
             } //if
         } //for
