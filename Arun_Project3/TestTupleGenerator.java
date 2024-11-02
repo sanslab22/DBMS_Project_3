@@ -18,7 +18,7 @@ import static java.lang.System.out;
 public class TestTupleGenerator
 {
     private static int numTuples = 10000;
-
+    
     /********************************************************************************
      * Run the first test for this table related to select search. This involves not having found a tuple in table.
      * Test case for regular select operation WITHOUT Indexing.
@@ -201,14 +201,17 @@ public class TestTupleGenerator
         );
         var tables = new String [] { "Student", "Professor", "Course", "Teaching", "Transcript" };
         var tableObjs = new Table[] {studentTable,professorTable,courseTable,teachingTable,transcriptTable};
-        var tups   = new int [] { numTuples, numTuples, numTuples, numTuples, numTuples };
+     // tups handles the number of tuples generated for the tables
+     // test case: 10000, 20000, 30000, 40000, 50000
+     var tups   = new int [] { numTuples, numTuples, numTuples, numTuples, numTuples };
+
         var  studentDIndex = new DIndex(tups[0] + 1);
         var  professorDIndex = new DIndex(tups[1] + 1);
         var  courseDIndex = new DIndex(tups[2] + 1);
         var  teachingDIndex = new DIndex(tups[3] + 1);
         var  transcriptDIndex = new DIndex(tups[4] + 1);
         var dIndexObjs = new DIndex[] {studentDIndex, professorDIndex, courseDIndex, teachingDIndex, transcriptDIndex};
-        // 1000, 2000,  5000, 7500, 10000, 25000, 50000
+     // generated the tuples to be inserted into the table
         var resultTest = test.generate (tups);
 
         for (var i = 0; i < resultTest.length; i++) {
@@ -233,6 +236,8 @@ public class TestTupleGenerator
                 testAverage[3] += testFour(tableObjs[4], tups[0]);
             } //if
             if (i == 5) {
+             // returns the time taken for each of the test cases in nanoseconds
+             // for graphing purposes, it is later converted to milliseconds in the GraphAnalysis.pdf as per instructions on elC
                 out.println("Test one - Select: " + (testAverage[0]/5) + " ns");
                 out.println("Test two - Indexed Select: " + (testAverage[1]/5) + " ns");
                 long selecter = ((testAverage[0]/5) + (testAverage[1]/5)) / 2;
